@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile</title>
+    <style>
+      .hidden { display: none; }
+      .container { max-width: 600px; margin: auto; }
+      .message.success { color: green; margin: 10px 0; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <% if (user) { %>
+        <h1>Welcome, <%= user.username || user.email %>!</h1>
+      <% } else { %>
+        <h1>User not found.</h1>
+      <% } %>
+
+      <% if (success) { %>
+        <div class="message success"><%= success %></div>
+      <% } %>
+
+      <table>
+        <tr>
+          <td>User ID:</td>
+          <td><%= user.id %></td>
+        </tr>
+        <tr>
+          <td>Username:</td>
+          <td><%= user.username %></td>
+        </tr>
+        <tr>
+          <td>Email:</td>
+          <td><%= user.email %></td>
+        </tr>
+        <tr>
+          <td>Created At:</td>
+          <td><%= new Date(user.created_at).toLocaleString() %></td>
+        </tr>
+      </table>
+
+      <!-- Logout Button -->
+      <form action="/auth/logout" method="POST" style="display: inline">
+        <button type="submit">Logout</button>
+      </form>
+
+      <!-- Update Button -->
+      <button id="toggleUpdateFormBtn">Update</button>
+
+      <!-- Delete Button -->
+      <button id="deleteBtn" data-id="<%= user.id %>" style="color: red">Delete</button>
+
+      <!-- Hidden Update Form -->
+      <form id="updateForm" class="hidden">
+        <input type="text" id="username" value="<%= user.username %>" required />
+        <input type="email" id="email" value="<%= user.email %>" required />
+        <button type="submit">Save Changes</button>
+      </form>
+    </div>
+
+    <script>
+      // Show/hide update form
+      const updateForm = document.getElementById("updateForm");
+      const toggleBtn = document.getElementById("toggleUpdateFormBtn");
+      toggleBtn.addEventListener("click", () => {
+        updateForm.classList.toggle("hidden");
+      });
+
+      // Handle update
+      updateForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const userId = "<%= user.id %>";
+        const username = document.getElementById("username").value;
+        const email = document.getElementById("email").value;
+
+        const response = await fetch(`/user/update/${userId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, email })
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+          alert("Profile updated successfully");
+          window.location.reload();
+        } else {
+          alert("Update failed: " + result.message);
+        }
+      });
+
+      // Handle delete
+      document.getElementById("deleteBtn").addEventListener("click", async () => {
+        const userId = document.getElementById("deleteBtn").dataset.id;
+        const confirmDelete = confirm("Are you sure you want to delete your account?");
+        if (!confirmDelete) return;
+
+        const response = await fetch(`/user/delete/${userId}`, {
+          method: "DELETE"
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+          alert("User deleted successfully");
+          window.location.href = "/auth/login";
+        } else {
+          alert("Delete failed: " + result.message);
+        }
+      });
+    </script>
+  </body>
+</html>

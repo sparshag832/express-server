@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <h1>HIII <%= 12+3 %></h1>
+  </head>
+  <body>
+    <ul>
+    <% for(var i=0;i<=5;i++){ %>
+         <li><%= i %></li>
+         <% } %>
+    </ul>   
+    <% var a=["apple","banana","Orange"] %>
+    <ol>
+        <% a.forEach((fruit)=>{ %>
+    <li> Fruit Name Is <%= fruit %></li> 
+    <% }); %>       
+   </ol>  
+
+   <!-- Escapes HTML -->
+<p><%= "<div>Hello!</div>" %></p>
+
+<!-- Does not escape HTML -->
+<p><%- "<div>Hello!</div>" %></p>
+  </body>
+</html>
